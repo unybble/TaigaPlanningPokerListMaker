@@ -10,7 +10,8 @@ namespace TaigaPlanningPokerListMaker
 {
     class Program
     {
-        private static string path = "C:\\Users\\jenanderson\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
+        private static string path = "/Users/Jen/Projects/TaigaPlanningPokerListMaker/TaigaPlanningPokerListMaker/csvs/";
+        private static string sub_path = "ByUser/";
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting List Maker");
@@ -18,6 +19,8 @@ namespace TaigaPlanningPokerListMaker
             List<Project> projects = new List<Project>();
             List<UserStory> userStories = new List<UserStory>();
             List<Issue> issues = new List<Issue>();
+            List<UserStory> userStoriesTesting = new List<UserStory>();
+            List<Issue> issuesTesting = new List<Issue>();
             Dictionary<string, List<Issue>> issuesByUser = new Dictionary<string, List<Issue>>();
             Dictionary<string, List<UserStory>> userStoriesByUser = new Dictionary<string, List<UserStory>>();
             List<string> uniqueUsers = new List<string>();
@@ -53,15 +56,16 @@ namespace TaigaPlanningPokerListMaker
 
 
                     //take only new and todo and add to larger list
-                    var t = p.userStories.Where(x => x.status_str.ToString().ToLower().Equals("new"));
-                   
+                    var t = p.userStories.Where(x => x.status_str.ToLower().Equals("new"));
+                   //get in testing too for sprint planning
+                   var testing = p.userStories.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
                     //update project name
                     t.ForEach(x => x.project_str = p.name);
-                   
+                    testing.ForEach(x => x.project_str = p.name);
                     userStories.AddRange(t);
-                   
+                    userStoriesTesting.AddRange(testing);
                     //create user specific list
-                    
+
 
                     p.issues = new List<Issue>();
                     p.issues = await Issue.GetAll(p.id, client);
@@ -70,12 +74,14 @@ namespace TaigaPlanningPokerListMaker
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
                     }
-                    var i = p.issues.Where(x => x.status_str.ToString().ToLower().Equals("new"));
+                    var i = p.issues.Where(x => x.status_str.ToLower().Equals("new"));
                   
                     i.ForEach(x => x.project_str = p.name);
                     issues.AddRange(i);
-                
+                    var ii = p.issues.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
 
+                    ii.ForEach(x => x.project_str = p.name);
+                    issuesTesting.AddRange(ii);
 
                 }
              
@@ -119,16 +125,35 @@ namespace TaigaPlanningPokerListMaker
                 csv.WriteRecords(unassigned_issues);
                 writer.Flush();
             }
-            using (var writer = new StreamWriter(path + "userStories_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
+            using (var writer = new StreamWriter(path + "user_stories_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
             using (var csv = new CsvWriter(writer))
             {
                 csv.Configuration.RegisterClassMap<UserStoryMap>();
                 csv.WriteRecords(userStories);
                 writer.Flush();
             }
-           //create csv per user
 
-            foreach(var name in uniqueUsers)
+
+
+            ///testing
+
+            using (var writer = new StreamWriter(path + "issues_completed_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
+            using (var csv = new CsvWriter(writer))
+            {
+                csv.Configuration.RegisterClassMap<IssueMap>();
+                csv.WriteRecords(issuesTesting);
+                writer.Flush();
+            }
+            using (var writer = new StreamWriter(path + "user_stories_completed_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
+            using (var csv = new CsvWriter(writer))
+            {
+                csv.Configuration.RegisterClassMap<UserStoryMap>();
+                csv.WriteRecords(userStoriesTesting);
+                writer.Flush();
+            }
+            /// /create csv per user
+
+            foreach (var name in uniqueUsers)
             {
 
                 Console.Write(name);
@@ -149,7 +174,7 @@ namespace TaigaPlanningPokerListMaker
                 }
                 if (_us.ToList().Count > 0)
                 {
-                    using (var writer = new StreamWriter(path + "ByUser\\user_stories_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
+                    using (var writer = new StreamWriter(path + sub_path+"user_stories_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
                     using (var csv = new CsvWriter(writer))
                     {
                         csv.Configuration.RegisterClassMap<UserStoryMap>();
@@ -161,7 +186,7 @@ namespace TaigaPlanningPokerListMaker
 
                 if (_issues.ToList().Count > 0)
                 {
-                    using (var writer = new StreamWriter(path + "ByUser\\issues_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
+                    using (var writer = new StreamWriter(path + sub_path+ "issues_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
                     using (var csv = new CsvWriter(writer))
                     {
                         csv.Configuration.RegisterClassMap<IssueMap>();
