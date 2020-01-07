@@ -40,6 +40,8 @@ namespace TaigaPlanningPokerListMaker
         public string blocked_note { get; set; }
         [Name("Is_Blocked")]
         public bool is_blocked { get; set; }
+        [Name("Finished")]
+       public string finished_date { get; set; }
         public long? project { get; set; }
         public long? status { get; set; }
         public long? priority { get; set; }

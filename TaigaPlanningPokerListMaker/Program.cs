@@ -109,8 +109,8 @@ namespace TaigaPlanningPokerListMaker
                .OrderByDescending(x=>x.backlog_order)
                .ToList();
 
-            userStoriesTesting.OrderByDescending(x => x.milestone);
-
+            userStoriesTesting = userStoriesTesting.OrderByDescending(x => x.milestone_start).ToList();
+            issuesTesting = issuesTesting.OrderByDescending(x => x.finished_date).ToList();
 
 
             using (var writer = new StreamWriter(path + "issues_"+DateTime.Now.ToString("MM-dd-yyyy")+".csv"))

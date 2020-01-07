@@ -42,6 +42,10 @@ namespace TaigaPlanningPokerListMaker
         public string blocked_note { get; set; }
         [Name("Milestone")]
         public string milestone_str { get; set; }
+        [Name("Milestone_Date")]
+        public DateTime milestone_start { get; set; }
+        [Name("Milestone_Points")]
+        public decimal? total_points { get; set; }
         public long? milestone { get; set; }
      
         public string comment { get; set; }
@@ -80,8 +84,14 @@ namespace TaigaPlanningPokerListMaker
             foreach (var u in _usList)
             {
               u.status_str = _status.FirstOrDefault(x => x.id == u.status).name;
-                if(u.milestone!=null)
+                if (u.milestone != null)
+                {
                     u.milestone_str = _milestone.FirstOrDefault(x => x.id == u.milestone).name;
+                    u.milestone_start= _milestone.FirstOrDefault(x => x.id == u.milestone).created_date;
+                    if(_milestone.FirstOrDefault(x => x.id == u.milestone).total_points>0)
+                     u.total_points = _milestone.FirstOrDefault(x => x.id == u.milestone).total_points;
+
+                }
 
             }
             return _usList;
