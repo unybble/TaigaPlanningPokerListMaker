@@ -10,6 +10,7 @@ namespace TaigaPlanningPokerListMaker
 {
     class Program
     {
+        private static DateTime upper_bound = DateTime.Now.AddDays(-31);
         private static string path = "/Users/Jen/Projects/TaigaPlanningPokerListMaker/TaigaPlanningPokerListMaker/csvs/";
         private static string sub_path = "ByUser/";
         static async Task Main(string[] args)
@@ -108,6 +109,7 @@ namespace TaigaPlanningPokerListMaker
                .OrderByDescending(x=>x.backlog_order)
                .ToList();
 
+            userStoriesTesting.OrderByDescending(x => x.milestone);
 
 
 
@@ -156,7 +158,7 @@ namespace TaigaPlanningPokerListMaker
             foreach (var name in uniqueUsers)
             {
 
-                Console.Write(name);
+                Console.WriteLine(name);
                 List<Issue> _issues = new List<Issue>();
 
                 if (issues.Any(x => x.assigned_to_name != null && x.assigned_to_name.Equals(name)))

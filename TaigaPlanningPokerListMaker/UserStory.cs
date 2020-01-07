@@ -40,8 +40,9 @@ namespace TaigaPlanningPokerListMaker
         public bool is_blocked { get; set; }
         [Name("Blocked_Note")]
         public string blocked_note { get; set; }
-
-        public string milestone { get; set; }
+        [Name("Milestone")]
+        public string milestone_str { get; set; }
+        public long? milestone { get; set; }
      
         public string comment { get; set; }
 
@@ -73,13 +74,14 @@ namespace TaigaPlanningPokerListMaker
             }
 
             var _status = await Status.GetAllUserStoryStatus(httpClient, projectId);
-      
+            var _milestone = await Milestone.GetAll(projectId, httpClient);
 
 
             foreach (var u in _usList)
             {
-                u.status_str = _status.FirstOrDefault(x => x.id == u.status).name;
-                
+              u.status_str = _status.FirstOrDefault(x => x.id == u.status).name;
+                if(u.milestone!=null)
+                    u.milestone_str = _milestone.FirstOrDefault(x => x.id == u.milestone).name;
 
             }
             return _usList;
