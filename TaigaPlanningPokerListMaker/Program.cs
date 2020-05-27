@@ -11,7 +11,7 @@ namespace TaigaPlanningPokerListMaker
     
     class Program
     {
-        private static List<string> tagFilters = new List<string>(){ "v3.9.0","v3.8.0" };
+        private static List<string> tagFilters = new List<string>();
         private static DateTime upper_bound = DateTime.Now.AddDays(-31);
         private static string path = "C:\\Users\\jen\\Documents\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
         private static string sub_path = "ByUser/";
@@ -64,7 +64,23 @@ namespace TaigaPlanningPokerListMaker
 
                     }
 
+                    //filter here
+                    if (tagFilters.Count > 0)
+                    {
+                        List<UserStory> filtered_us = new List<UserStory>();
+                        foreach (var filter in tagFilters)
+                        {
 
+                            if (userStories.Any(x => x.tag_list.Contains(filter)))
+                            {
+                                var filtered = userStories.Where(x => x.tag_list.Contains(filter));
+                                filtered_us.AddRange(filtered);
+                            }
+                        }
+                        userStories = filtered_us;
+                    }
+                    userStories = await UserStory.GetDetails(userStories, client);
+                   
 
                     //take only new and todo and add to larger list
                     var t = p.userStories.Where(x => x.status_str.ToLower().Equals("new"));
@@ -102,20 +118,23 @@ namespace TaigaPlanningPokerListMaker
             }//end using
 
             //tag filtering
-            List<Issue> filtered_issues = new List<Issue>(); ;
-            foreach (var filter in tagFilters)
+            List<Issue> filtered_issues = new List<Issue>();
+            if (tagFilters.Count > 0)
             {
-
-                if (issues.Any(x => x.tag_list.Contains(filter)))
+                foreach (var filter in tagFilters)
                 {
-                    var filtered = issues.Where(x => x.tag_list.Contains(filter));
-                    filtered_issues.AddRange(filtered);
+
+                    if (issues.Any(x => x.tag_list.Contains(filter)))
+                    {
+                        var filtered = issues.Where(x => x.tag_list.Contains(filter));
+                        filtered_issues.AddRange(filtered);
+                    }
                 }
+                issues = filtered_issues;
             }
-            issues = filtered_issues;
-                //do whatever filtering
-                //1. no ecriss 3.0
-                issues = issues.Where(x =>
+            //do whatever filtering
+            //1. no ecriss 3.0
+            issues = issues.Where(x =>
                 !x.subject.ToLower().Contains("alpha30") &&
                 !x.subject.ToLower().Contains("beta40") &&
                 !x.subject.ToLower().Contains("[3.0]"))
@@ -123,17 +142,7 @@ namespace TaigaPlanningPokerListMaker
 
             var unassigned_issues = issues.Where(x => x.assigned_to == null);
 
-            List<UserStory> filtered_us = new List<UserStory>();
-            foreach (var filter in tagFilters) {
-              
-                if (userStories.Any(x => x.tag_list.Contains(filter)))
-                {
-                    var filtered = userStories.Where(x => x.tag_list.Contains(filter));
-                    filtered_us.AddRange(filtered);
-                }
-            }
-
-            userStories = filtered_us;
+           
             userStories = userStories.Where(x =>
                !x.subject.ToLower().Contains("alpha30") &&
                !x.subject.ToLower().Contains("beta40") &&
@@ -145,7 +154,10 @@ namespace TaigaPlanningPokerListMaker
             userStoriesTesting = userStoriesTesting.OrderByDescending(x => x.milestone_start).ToList();
             issuesTesting = issuesTesting.OrderByDescending(x => x.finished_date).ToList();
 
+            
 
+
+            //CSV WRITING
             using (var writer = new StreamWriter(path + "issues_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
             using (var csv = new CsvWriter(writer))
             {

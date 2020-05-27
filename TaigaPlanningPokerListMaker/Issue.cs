@@ -104,6 +104,18 @@ namespace TaigaPlanningPokerListMaker
         public bool is_blocked { get; set; }
         [Name("Finished")]
        public string finished_date { get; set; }
+        [Name("Description")]
+        public string description { get; set; }
+        [Name("HasExpectedActual")]
+        public bool has_acceptance_criteria
+        {
+            get
+            {
+                if(description!=null)
+                    return description.ToLower().Contains("expect") && description.ToLower().Contains("actual");
+                return false;
+            }
+        }
         public long? project { get; set; }
         public long? status { get; set; }
         public long? priority { get; set; }

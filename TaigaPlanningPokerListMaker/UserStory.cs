@@ -4,6 +4,7 @@ using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Runtime.Serialization;
 using System.Text;
@@ -24,17 +25,21 @@ namespace TaigaPlanningPokerListMaker
             Map(m => m.is_closed).Ignore();
             Map(m => m.tags).Ignore();
             Map(m => m.tag_list).Ignore();
+            Map(m => m.id).Ignore();
         }
     }
 
     public class UserStory
     {
+        [Name("Id")]
+        public string id { get; set; }
         [Name("Project")]
         public string project_str { get; set; }
         [Name("Assigned_To")]
         public string assigned_to_name { get; set; }
         [Name("Subject")]
         public string subject { get; set; }
+        
         [Name("Tags")]
         public string tags_as_string {
           
@@ -55,6 +60,18 @@ namespace TaigaPlanningPokerListMaker
             } 
         }
 
+        [Name("Description")]
+        public string description { get; set; }
+        [Name("HasAcceptanceCriteria")]
+        public bool has_acceptance_criteria
+        {
+            get
+            {
+                if (description != null)
+                    return description.ToLower().Contains("acceptance criteria");
+                return false;
+            }
+        }
         public List<string> tag_list
         {
             get
@@ -98,7 +115,25 @@ namespace TaigaPlanningPokerListMaker
         public long? status { get; set; }
       
 
+        public static async Task<List<UserStory>> GetDetails(List<UserStory> stories, AuthHttpClient httpClient)
+        {
+            var _stories = new List<UserStory>();
+            foreach (var s in stories)
+            {
+                using (var response = await httpClient.GetAsync("userstories/" + s.id))
+                {
 
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (content.Length != 0)
+                    {
+                        UserStory story = JObject.Parse(content).ToObject<UserStory>();
+                        _stories.Add(story);
+
+                    }
+                }
+            }
+            return _stories;
+        }
         public static async Task<List<UserStory>> GetAll(long projectId, AuthHttpClient httpClient)
         {
 
