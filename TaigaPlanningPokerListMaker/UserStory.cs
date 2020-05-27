@@ -23,7 +23,7 @@ namespace TaigaPlanningPokerListMaker
             Map(m => m.comment).Ignore();
             Map(m => m.is_closed).Ignore();
             Map(m => m.tags).Ignore();
-
+            Map(m => m.tag_list).Ignore();
         }
     }
 
@@ -36,7 +36,7 @@ namespace TaigaPlanningPokerListMaker
         [Name("Subject")]
         public string subject { get; set; }
         [Name("Tags")]
-        public string tag_list {
+        public string tags_as_string {
           
         get {
                 var retValue = "--";
@@ -53,6 +53,20 @@ namespace TaigaPlanningPokerListMaker
                 }
                 return retValue;
             } 
+        }
+
+        public List<string> tag_list
+        {
+            get
+            {
+                List<string> list = new List<string>();
+                if (tags.Count > 0)
+                {
+                    foreach (JArray t in tags)
+                        list.Add(t.FirstOrDefault().ToString());
+                }
+                return list;
+            }
         }
         public JArray tags { get; set; }
         [Name("Status")]
