@@ -11,13 +11,13 @@ namespace TaigaPlanningPokerListMaker
     class Program
     {
         private static DateTime upper_bound = DateTime.Now.AddDays(-31);
-        private static string path = "C:\\Users\\jenanderson\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
+        private static string path = "C:\\Users\\jen\\Documents\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
         private static string sub_path = "ByUser/";
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting List Maker");
-            //  await CreateReports();
-            await CreateSpecificReport("PLP");
+              await CreateReports();
+            //await CreateSpecificReport("PLP");
 
 
 

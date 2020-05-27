@@ -1,9 +1,11 @@
 ﻿using CsvHelper.Configuration;
 using CsvHelper.Configuration.Attributes;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.Serialization;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -20,6 +22,7 @@ namespace TaigaPlanningPokerListMaker
             Map(m => m.milestone).Ignore();
             Map(m => m.comment).Ignore();
             Map(m => m.is_closed).Ignore();
+            Map(m => m.tags).Ignore();
 
         }
     }
@@ -32,6 +35,26 @@ namespace TaigaPlanningPokerListMaker
         public string assigned_to_name { get; set; }
         [Name("Subject")]
         public string subject { get; set; }
+        [Name("Tags")]
+        public string tag_list {
+          
+        get {
+                var retValue = "--";
+                if (tags.Count> 0)
+                {
+                    var sb = new StringBuilder();
+                    foreach (JArray t in tags)
+                    {
+                        sb.Append(t.FirstOrDefault());
+                        sb.Append(", ");
+                    }
+                    var str = sb.ToString();
+                    retValue = str.Substring(0, str.Length-2);   
+                }
+                return retValue;
+            } 
+        }
+        public JArray tags { get; set; }
         [Name("Status")]
         public string status_str { get; set; }
         [Name("Backlog_Order")]
@@ -52,7 +75,8 @@ namespace TaigaPlanningPokerListMaker
 
      
         public bool is_closed { get; set; }
-      
+        
+       
        
         public long? project { get; set; }
 
@@ -72,8 +96,8 @@ namespace TaigaPlanningPokerListMaker
                 var content = await response.Content.ReadAsStringAsync();
                 if (content.Length != 0)
                 {
-                    _usList = JArray.Parse(content).ToObject<List<UserStory>>();
-
+                     _usList = JArray.Parse(content).ToObject<List<UserStory>>();
+                   
                 }
             }
 

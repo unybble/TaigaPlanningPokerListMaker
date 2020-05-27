@@ -20,6 +20,7 @@ namespace TaigaPlanningPokerListMaker
             Map(m => m.status).Ignore();
             Map(m => m.priority).Ignore();
             Map(m => m.type).Ignore();
+            Map(m => m.tags).Ignore();
         }
     }
 
@@ -52,6 +53,28 @@ namespace TaigaPlanningPokerListMaker
         public string assigned_to_name { get; set; }
         [Name("Subject")]
         public string subject { get; set; }
+        [Name("Tags")]
+        public string tag_list
+        {
+
+            get
+            {
+                var retValue = "--";
+                if (tags.Count > 0)
+                {
+                    var sb = new StringBuilder();
+                    foreach (JArray t in tags)
+                    {
+                        sb.Append(t.FirstOrDefault());
+                        sb.Append(", ");
+                    }
+                    var str = sb.ToString();
+                    retValue = str.Substring(0, str.Length - 2);
+                }
+                return retValue;
+            }
+        }
+        public JArray tags { get; set; }
         [Name("Status")]
         public string status_str { get; set; }
         [Name("Priority")]
