@@ -117,7 +117,7 @@ namespace TaigaPlanningPokerListMaker
             CSVReportWriter.OutputIssues(path, issuesTesting, "issues_completed");
             CSVReportWriter.OutputUserStories(path, userStories, "user_stories");
             CSVReportWriter.OutputUserStories(path, userStoriesTesting, "user_stories_completed_");
-
+            CSVReportWriter.OutputByUser(path, uniqueUsers, userStories, issues);
             Console.WriteLine("End");
         }
 

@@ -11,6 +11,7 @@ namespace TaigaPlanningPokerListMaker
     {
         public static void OutputIssues(string path, List<Issue> issues, string fileName)
         {
+            Directory.CreateDirectory(path);
             using var writer = new StreamWriter(path + fileName + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
             using var csv = new CsvWriter(writer);
             csv.Configuration.RegisterClassMap<IssueMap>();
@@ -20,6 +21,7 @@ namespace TaigaPlanningPokerListMaker
 
         public static void OutputUserStories(string path, List<UserStory> userStories, string fileName)
         {
+            Directory.CreateDirectory(path);
             using var writer = new StreamWriter(path + fileName + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
             using var csv = new CsvWriter(writer);
             csv.Configuration.RegisterClassMap<UserStoryMap>();
@@ -28,7 +30,7 @@ namespace TaigaPlanningPokerListMaker
         }
 
 
-        public static void OutputByUser(string path,List<User> users, List<UserStory> userStories, List<Issue> issues)
+        public static void OutputByUser(string path,List<string> users, List<UserStory> userStories, List<Issue> issues)
         {
 
             Directory.CreateDirectory(path);
