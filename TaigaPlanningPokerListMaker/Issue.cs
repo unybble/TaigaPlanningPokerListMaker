@@ -14,6 +14,7 @@ namespace TaigaPlanningPokerListMaker
         public IssueMap()
         {
             AutoMap();
+            Map(m => m.id).Ignore();
             Map(m => m.assigned_to).Ignore();
             Map(m => m.project).Ignore();
             Map(m => m.severity).Ignore();
@@ -48,10 +49,14 @@ namespace TaigaPlanningPokerListMaker
 
     public class Issue
     {
+        [Name("Id")]
+        public string id { get; set; }
         [Name("Project")]
         public string project_str { get; set; }
         [Name("Assigned_To")]
         public string assigned_to_name { get; set; }
+        [Name("Reference")]
+        public string reference { get; set; }
         [Name("Subject")]
         public string subject { get; set; }
         [Name("Tags")]
@@ -122,6 +127,43 @@ namespace TaigaPlanningPokerListMaker
         public long? type { get; set; }
         public long? severity { get; set; }
         public long? assigned_to { get; set; }
+
+        public static async Task<List<Issue>> GetDetails(List<Issue> issues, AuthHttpClient httpClient)
+        {
+            var _issues = new List<Issue>();
+            foreach (var s in issues)
+            {
+                using var response = await httpClient.GetAsync("issues/" + s.id);
+                var content = await response.Content.ReadAsStringAsync();
+                if (content.Length != 0)
+                {
+                    Issue issue = JObject.Parse(content).ToObject<Issue>();
+                    _issues.Add(issue);
+
+                }
+            }
+            return _issues;
+        }
+
+        public static List<Issue> Filter(List<Issue> issues)
+        {
+            List<Issue> filtered = new List<Issue>();
+            if (FilterOptions.Tags.Count > 0)
+            {
+                foreach (var filter in FilterOptions.Tags)
+                {
+
+                    if (issues.Any(x => x.tag_list.Contains(filter)))
+                    {
+                        var _filtered = issues.Where(x => x.tag_list.Contains(filter));
+                        filtered.AddRange(_filtered);
+                    }
+                }
+                return filtered;
+            }
+
+            return issues;
+        }
 
         public static async Task<List<Issue>> GetAll(long projectId, AuthHttpClient client)
         {

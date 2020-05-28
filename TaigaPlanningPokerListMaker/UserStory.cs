@@ -31,12 +31,16 @@ namespace TaigaPlanningPokerListMaker
 
     public class UserStory
     {
+     
+
         [Name("Id")]
         public string id { get; set; }
         [Name("Project")]
         public string project_str { get; set; }
         [Name("Assigned_To")]
         public string assigned_to_name { get; set; }
+        [Name("Reference")]
+        public string reference { get; set; }
         [Name("Subject")]
         public string subject { get; set; }
         
@@ -101,35 +105,50 @@ namespace TaigaPlanningPokerListMaker
         [Name("Milestone_Points")]
         public decimal? total_points { get; set; }
         public long? milestone { get; set; }
-     
         public string comment { get; set; }
-
-     
         public bool is_closed { get; set; }
-        
-       
-       
         public long? project { get; set; }
 
         public long? assigned_to { get; set; }
         public long? status { get; set; }
-      
 
+        public static List<UserStory> Filter(List<UserStory> userStories, bool noMilestone = true)
+        {
+            
+            if (FilterOptions.Tags.Count > 0)
+            {
+                List<UserStory> filtered = new List<UserStory>();
+                foreach (var filter in FilterOptions.Tags)
+                {
+
+                    if (userStories.Any(x => x.tag_list.Contains(filter)))
+                    {
+                        var _filtered = userStories.Where(x => x.tag_list.Contains(filter));
+                        filtered.AddRange(_filtered);
+                    }
+                }
+                if (noMilestone)
+                    filtered = filtered.Where(x => x.milestone == null).ToList();
+               
+                return filtered.OrderByDescending(x => x.backlog_order).ToList();
+            }
+            if (noMilestone)
+                userStories=userStories.Where(x => x.milestone == null).ToList();
+
+            return userStories.OrderByDescending(x => x.backlog_order).ToList();
+        }
         public static async Task<List<UserStory>> GetDetails(List<UserStory> stories, AuthHttpClient httpClient)
         {
             var _stories = new List<UserStory>();
             foreach (var s in stories)
             {
-                using (var response = await httpClient.GetAsync("userstories/" + s.id))
+                using var response = await httpClient.GetAsync("userstories/" + s.id);
+                var content = await response.Content.ReadAsStringAsync();
+                if (content.Length != 0)
                 {
+                    UserStory story = JObject.Parse(content).ToObject<UserStory>();
+                    _stories.Add(story);
 
-                    var content = await response.Content.ReadAsStringAsync();
-                    if (content.Length != 0)
-                    {
-                        UserStory story = JObject.Parse(content).ToObject<UserStory>();
-                        _stories.Add(story);
-
-                    }
                 }
             }
             return _stories;

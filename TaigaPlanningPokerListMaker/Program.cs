@@ -11,7 +11,6 @@ namespace TaigaPlanningPokerListMaker
     
     class Program
     {
-        private static List<string> tagFilters = new List<string>();
         private static DateTime upper_bound = DateTime.Now.AddDays(-31);
         private static string path = "C:\\Users\\jen\\Documents\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
         private static string sub_path = "ByUser/";
@@ -64,22 +63,7 @@ namespace TaigaPlanningPokerListMaker
 
                     }
 
-                    //filter here
-                    if (tagFilters.Count > 0)
-                    {
-                        List<UserStory> filtered_us = new List<UserStory>();
-                        foreach (var filter in tagFilters)
-                        {
-
-                            if (userStories.Any(x => x.tag_list.Contains(filter)))
-                            {
-                                var filtered = userStories.Where(x => x.tag_list.Contains(filter));
-                                filtered_us.AddRange(filtered);
-                            }
-                        }
-                        userStories = filtered_us;
-                    }
-                    userStories = await UserStory.GetDetails(userStories, client);
+                  
                    
 
                     //take only new and todo and add to larger list
@@ -101,8 +85,8 @@ namespace TaigaPlanningPokerListMaker
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
                     }
-                    var i = p.issues.Where(x => x.status_str.ToLower().Equals("new"));
-
+                    //var i = p.issues.Where(x => x.status_str.ToLower().Equals("new"));
+                    var i = p.issues.Where(x => !x.status_str.ToLower().Equals("ready for test") && !x.status_str.ToLower().Equals("done") && !x.status_str.ToLower().Equals("archived"));
                     i.ForEach(x => x.project_str = p.name);
                     issues.AddRange(i);
                     var ii = p.issues.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
@@ -111,45 +95,16 @@ namespace TaigaPlanningPokerListMaker
                     issuesTesting.AddRange(ii);
 
                 }
-
-
-
-
+                userStories = UserStory.Filter(userStories);
+                userStories = await UserStory.GetDetails(userStories, client);
+                issues = Issue.Filter(issues);
+                issues = await Issue.GetDetails(issues, client);
             }//end using
 
-            //tag filtering
-            List<Issue> filtered_issues = new List<Issue>();
-            if (tagFilters.Count > 0)
-            {
-                foreach (var filter in tagFilters)
-                {
-
-                    if (issues.Any(x => x.tag_list.Contains(filter)))
-                    {
-                        var filtered = issues.Where(x => x.tag_list.Contains(filter));
-                        filtered_issues.AddRange(filtered);
-                    }
-                }
-                issues = filtered_issues;
-            }
-            //do whatever filtering
-            //1. no ecriss 3.0
-            issues = issues.Where(x =>
-                !x.subject.ToLower().Contains("alpha30") &&
-                !x.subject.ToLower().Contains("beta40") &&
-                !x.subject.ToLower().Contains("[3.0]"))
-                .ToList();
+         
 
             var unassigned_issues = issues.Where(x => x.assigned_to == null).ToList();
-
-           
-            userStories = userStories.Where(x =>
-               !x.subject.ToLower().Contains("alpha30") &&
-               !x.subject.ToLower().Contains("beta40") &&
-               x.milestone == null &&
-               !x.subject.ToLower().Contains("[3.0]"))
-               .OrderByDescending(x => x.backlog_order)
-               .ToList();
+            unassigned_issues = Issue.Filter(unassigned_issues);
 
             userStoriesTesting = userStoriesTesting.OrderByDescending(x => x.milestone_start).ToList();
             issuesTesting = issuesTesting.OrderByDescending(x => x.finished_date).ToList();
