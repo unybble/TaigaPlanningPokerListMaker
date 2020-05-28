@@ -140,7 +140,7 @@ namespace TaigaPlanningPokerListMaker
                 !x.subject.ToLower().Contains("[3.0]"))
                 .ToList();
 
-            var unassigned_issues = issues.Where(x => x.assigned_to == null);
+            var unassigned_issues = issues.Where(x => x.assigned_to == null).ToList();
 
            
             userStories = userStories.Where(x =>
@@ -154,95 +154,14 @@ namespace TaigaPlanningPokerListMaker
             userStoriesTesting = userStoriesTesting.OrderByDescending(x => x.milestone_start).ToList();
             issuesTesting = issuesTesting.OrderByDescending(x => x.finished_date).ToList();
 
-            
 
 
-            //CSV WRITING
-            using (var writer = new StreamWriter(path + "issues_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-            using (var csv = new CsvWriter(writer))
-            {
-                csv.Configuration.RegisterClassMap<IssueMap>();
-                csv.WriteRecords(issues);
-                writer.Flush();
-            }
-            using (var writer = new StreamWriter(path + "unassigned_issues_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-            using (var csv = new CsvWriter(writer))
-            {
-                csv.Configuration.RegisterClassMap<IssueMap>();
-                csv.WriteRecords(unassigned_issues);
-                writer.Flush();
-            }
-            using (var writer = new StreamWriter(path + "user_stories_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-            using (var csv = new CsvWriter(writer))
-            {
-                csv.Configuration.RegisterClassMap<UserStoryMap>();
-                csv.WriteRecords(userStories);
-                writer.Flush();
-            }
-
-
-
-            ///testing
-
-            using (var writer = new StreamWriter(path + "issues_completed_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-            using (var csv = new CsvWriter(writer))
-            {
-                csv.Configuration.RegisterClassMap<IssueMap>();
-                csv.WriteRecords(issuesTesting);
-                writer.Flush();
-            }
-            using (var writer = new StreamWriter(path + "user_stories_completed_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-            using (var csv = new CsvWriter(writer))
-            {
-                csv.Configuration.RegisterClassMap<UserStoryMap>();
-                csv.WriteRecords(userStoriesTesting);
-                writer.Flush();
-            }
-            /// /create csv per user
-
-            foreach (var name in uniqueUsers)
-            {
-
-                Console.WriteLine(name);
-                List<Issue> _issues = new List<Issue>();
-
-                if (issues.Any(x => x.assigned_to_name != null && x.assigned_to_name.Equals(name)))
-                {
-
-                    _issues = issues.Where(x => x.assigned_to_name != null && x.assigned_to_name.Equals(name)).DefaultIfEmpty().ToList();
-
-                }
-
-
-                List<UserStory> _us = new List<UserStory>();
-                if (userStories.Any(x => x.assigned_to_name != null && x.assigned_to_name.Equals(name)))
-                {
-                    _us = userStories.Where(x => x.assigned_to_name != null && x.assigned_to_name.Equals(name)).DefaultIfEmpty().ToList();
-                }
-                if (_us.ToList().Count > 0)
-                {
-                    using (var writer = new StreamWriter(path + sub_path + "user_stories_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-                    using (var csv = new CsvWriter(writer))
-                    {
-                        csv.Configuration.RegisterClassMap<UserStoryMap>();
-                        csv.WriteRecords(_us);
-                        writer.Flush();
-                    }
-
-                }
-
-                if (_issues.ToList().Count > 0)
-                {
-                    using (var writer = new StreamWriter(path + sub_path + "issues_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv"))
-                    using (var csv = new CsvWriter(writer))
-                    {
-                        csv.Configuration.RegisterClassMap<IssueMap>();
-                        csv.WriteRecords(_issues);
-                        writer.Flush();
-                    }
-                }
-            }
-
+            //*** CSV Writing ***//
+            CSVReportWriter.OutputIssues(path, issues, "issues");
+            CSVReportWriter.OutputIssues(path, unassigned_issues, "unassigned_issues");
+            CSVReportWriter.OutputIssues(path, issuesTesting, "issues_completed");
+            CSVReportWriter.OutputUserStories(path, userStories, "user_stories");
+            CSVReportWriter.OutputUserStories(path, userStoriesTesting, "user_stories_completed_");
 
             Console.WriteLine("End");
         }
