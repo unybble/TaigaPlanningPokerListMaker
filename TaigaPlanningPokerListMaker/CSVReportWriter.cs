@@ -56,7 +56,7 @@ namespace TaigaPlanningPokerListMaker
                 }
                 if (_us.ToList().Count > 0)
                 {
-                    using var writer = new StreamWriter(path + "user_stories_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
+                    using var writer = new StreamWriter(path + "/user_stories_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
                     using var csv = new CsvWriter(writer);
                     csv.Configuration.RegisterClassMap<UserStoryMap>();
                     csv.WriteRecords(_us);
@@ -66,7 +66,7 @@ namespace TaigaPlanningPokerListMaker
 
                 if (_issues.ToList().Count > 0)
                 {
-                    using var writer = new StreamWriter(path + "issues_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
+                    using var writer = new StreamWriter(path + "/issues_" + name + "_" + DateTime.Now.ToString("MM-dd-yyyy") + ".csv");
                     using var csv = new CsvWriter(writer);
                     csv.Configuration.RegisterClassMap<IssueMap>();
                     csv.WriteRecords(_issues);

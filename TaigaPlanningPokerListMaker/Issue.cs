@@ -130,7 +130,7 @@ namespace TaigaPlanningPokerListMaker
 
         public static async Task<List<Issue>> GetDetails(List<Issue> issues, AuthHttpClient httpClient)
         {
-            var _issues = new List<Issue>();
+            
             foreach (var s in issues)
             {
                 using var response = await httpClient.GetAsync("issues/" + s.id);
@@ -138,11 +138,11 @@ namespace TaigaPlanningPokerListMaker
                 if (content.Length != 0)
                 {
                     Issue issue = JObject.Parse(content).ToObject<Issue>();
-                    _issues.Add(issue);
+                    s.description = issue.description;
 
                 }
             }
-            return _issues;
+            return issues;
         }
 
         public static List<Issue> Filter(List<Issue> issues)

@@ -13,7 +13,7 @@ namespace TaigaPlanningPokerListMaker
     {
         private static DateTime upper_bound = DateTime.Now.AddDays(-31);
         private static string path = "C:\\Users\\jen\\Documents\\GitHub\\TaigaPlanningPokerListMaker\\TaigaPlanningPokerListMaker\\csvs\\";
-        private static string sub_path = "ByUser/";
+  
         static async Task Main(string[] args)
         {
             Console.WriteLine("Starting List Maker");
@@ -117,7 +117,7 @@ namespace TaigaPlanningPokerListMaker
             CSVReportWriter.OutputIssues(path, issuesTesting, "issues_completed");
             CSVReportWriter.OutputUserStories(path, userStories, "user_stories");
             CSVReportWriter.OutputUserStories(path, userStoriesTesting, "user_stories_completed_");
-            CSVReportWriter.OutputByUser(path, uniqueUsers, userStories, issues);
+            CSVReportWriter.OutputByUser(path+"/ByUser", uniqueUsers, userStories, issues);
             Console.WriteLine("End");
         }
 

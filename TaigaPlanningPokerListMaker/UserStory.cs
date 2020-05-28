@@ -139,7 +139,6 @@ namespace TaigaPlanningPokerListMaker
         }
         public static async Task<List<UserStory>> GetDetails(List<UserStory> stories, AuthHttpClient httpClient)
         {
-            var _stories = new List<UserStory>();
             foreach (var s in stories)
             {
                 using var response = await httpClient.GetAsync("userstories/" + s.id);
@@ -147,11 +146,11 @@ namespace TaigaPlanningPokerListMaker
                 if (content.Length != 0)
                 {
                     UserStory story = JObject.Parse(content).ToObject<UserStory>();
-                    _stories.Add(story);
+                    s.description = story.description;
 
                 }
             }
-            return _stories;
+            return stories;
         }
         public static async Task<List<UserStory>> GetAll(long projectId, AuthHttpClient httpClient)
         {
