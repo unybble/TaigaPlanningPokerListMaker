@@ -45,15 +45,17 @@ namespace TaigaPlanningPokerListMaker
 
                 foreach (var p in projects)
                 {
+                    Console.WriteLine(p.name);
                     //list of users for open issues
                     List<User> _users = await User.GetAll(p.id, client);
-
+                    Console.WriteLine("User Count: "+_users.Count.ToString());
                     //get unique names
                     uniqueUsers = _users.Select(x => x.full_name).Distinct().ToList();
 
                     p.userStories = new List<UserStory>();
                     p.userStories = await UserStory.GetAll(p.id, client);
-
+                    Console.WriteLine("User Stories: " + p.userStories.Count.ToString());
+                    ;
                     //add username to the userlist
                     foreach (var u in p.userStories)
                     {
@@ -82,6 +84,8 @@ namespace TaigaPlanningPokerListMaker
 
                     p.issues = new List<Issue>();
                     p.issues = await Issue.GetAll(p.id, client);
+                    Console.WriteLine("Issues: " + p.issues.Count.ToString());
+
                     foreach (var u in p.issues)
                     {
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))

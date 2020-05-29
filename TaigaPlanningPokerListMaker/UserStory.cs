@@ -165,6 +165,7 @@ namespace TaigaPlanningPokerListMaker
             using (var response = await httpClient.GetAsync("userstories?project=" + projectId))
             {
                 var content = await response.Content.ReadAsStringAsync();
+                content = content.Replace("ref", "reference");
                 if (content.Length != 0)
                 {
                      _usList = JArray.Parse(content).ToObject<List<UserStory>>();
