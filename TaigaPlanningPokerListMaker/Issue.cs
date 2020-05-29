@@ -56,7 +56,7 @@ namespace TaigaPlanningPokerListMaker
         public string project_str { get; set; }
         [Name("Assigned_To")]
         public string assigned_to_name { get; set; }
-        [Name("Owner_To")]
+        [Name("Owner")]
         public string owner_name { get; set; }
         [Name("Reference")]
         public string reference { get; set; }
