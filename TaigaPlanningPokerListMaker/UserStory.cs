@@ -18,6 +18,7 @@ namespace TaigaPlanningPokerListMaker
         {
             AutoMap();
             Map(m => m.assigned_to).Ignore();
+            Map(m => m.owner).Ignore();
             Map(m => m.project).Ignore();
             Map(m => m.status).Ignore();
             Map(m => m.milestone).Ignore();
@@ -39,6 +40,8 @@ namespace TaigaPlanningPokerListMaker
         public string project_str { get; set; }
         [Name("Assigned_To")]
         public string assigned_to_name { get; set; }
+        [Name("Owner")]
+        public string owner_name { get; set; }
         [Name("Reference")]
         public string reference { get; set; }
         [Name("Subject")]
@@ -110,6 +113,7 @@ namespace TaigaPlanningPokerListMaker
         public long? project { get; set; }
 
         public long? assigned_to { get; set; }
+        public long? owner { get; set; }
         public long? status { get; set; }
 
         public static List<UserStory> Filter(List<UserStory> userStories, bool noMilestone = true)

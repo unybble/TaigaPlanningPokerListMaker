@@ -60,14 +60,16 @@ namespace TaigaPlanningPokerListMaker
 
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
+                        if (u.owner != null && _users.Any(x => x.id == u.owner))
+                            u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
 
                     }
 
-                  
-                   
+
+
 
                     //take only new and todo and add to larger list
-                    var t = p.userStories.Where(x => x.status_str.ToLower().Equals("new"));
+                    var t = p.userStories;//.Where(x => x.status_str.ToLower().Equals("new"));
                     //get in testing too for sprint planning
                     var testing = p.userStories.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
                     //update project name
@@ -84,6 +86,8 @@ namespace TaigaPlanningPokerListMaker
                     {
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
+                        if(u.owner !=null && _users.Any(x => x.id == u.owner))
+                            u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
                     }
                     //var i = p.issues.Where(x => x.status_str.ToLower().Equals("new"));
                     var i = p.issues.Where(x => !x.status_str.ToLower().Equals("ready for test") && !x.status_str.ToLower().Equals("done") && !x.status_str.ToLower().Equals("archived"));
@@ -155,6 +159,9 @@ namespace TaigaPlanningPokerListMaker
                     {
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
+                        if (u.owner != null && _users.Any(x => x.id == u.owner))
+                            u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
+
                     }
 
                     p.issues.ForEach(x => x.project_str = p.name);
