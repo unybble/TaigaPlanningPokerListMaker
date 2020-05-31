@@ -29,10 +29,7 @@ namespace TaigaPlanningPokerListMaker
             List<Project> projects = new List<Project>();
             List<UserStory> userStories = new List<UserStory>();
             List<Issue> issues = new List<Issue>();
-            List<UserStory> userStoriesTesting = new List<UserStory>();
-            List<Issue> issuesTesting = new List<Issue>();
-            Dictionary<string, List<Issue>> issuesByUser = new Dictionary<string, List<Issue>>();
-            Dictionary<string, List<UserStory>> userStoriesByUser = new Dictionary<string, List<UserStory>>();
+        
             List<string> uniqueUsers = new List<string>();
 
             using (var client = new AuthHttpClient())
@@ -48,13 +45,11 @@ namespace TaigaPlanningPokerListMaker
                     Console.WriteLine(p.name);
                     //list of users for open issues
                     List<User> _users = await User.GetAll(p.id, client);
-                    Console.WriteLine("User Count: "+_users.Count.ToString());
                     //get unique names
                     uniqueUsers = _users.Select(x => x.full_name).Distinct().ToList();
 
                     p.userStories = new List<UserStory>();
                     p.userStories = await UserStory.GetAll(p.id, client);
-                    Console.WriteLine("User Stories: " + p.userStories.Count.ToString());
                     ;
                     //add username to the userlist
                     foreach (var u in p.userStories)
@@ -67,24 +62,15 @@ namespace TaigaPlanningPokerListMaker
 
                     }
 
-
-
-
-                    //take only new and todo and add to larger list
-                    var t = p.userStories;//.Where(x => x.status_str.ToLower().Equals("new"));
-                    //get in testing too for sprint planning
-                    var testing = p.userStories.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
                     //update project name
-                    t.ForEach(x => x.project_str = p.name);
-                    testing.ForEach(x => x.project_str = p.name);
-                    userStories.AddRange(t);
-                    userStoriesTesting.AddRange(testing);
+                    p.userStories.ForEach(x => x.project_str = p.name);
+                    userStories.AddRange(p.userStories);
                     //create user specific list
 
 
                     p.issues = new List<Issue>();
                     p.issues = await Issue.GetAll(p.id, client);
-                    Console.WriteLine("Issues: " + p.issues.Count.ToString());
+                
 
                     foreach (var u in p.issues)
                     {
@@ -93,14 +79,11 @@ namespace TaigaPlanningPokerListMaker
                         if(u.owner !=null && _users.Any(x => x.id == u.owner))
                             u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
                     }
-                    //var i = p.issues.Where(x => x.status_str.ToLower().Equals("new"));
-                    var i = p.issues.Where(x => !x.status_str.ToLower().Equals("ready for test") && !x.status_str.ToLower().Equals("done") && !x.status_str.ToLower().Equals("archived"));
+                    var i = p.issues.Where(x =>  !x.status_str.ToLower().Equals("archived"));
                     i.ForEach(x => x.project_str = p.name);
                     issues.AddRange(i);
-                    var ii = p.issues.Where(x => x.status_str.ToLower().Contains("ready for test") || x.status_str.ToLower().Contains("done"));
 
-                    ii.ForEach(x => x.project_str = p.name);
-                    issuesTesting.AddRange(ii);
+                 
 
                 }
                 userStories = UserStory.Filter(userStories);
@@ -111,21 +94,11 @@ namespace TaigaPlanningPokerListMaker
 
          
 
-            var unassigned_issues = issues.Where(x => x.assigned_to == null).ToList();
-            unassigned_issues = Issue.Filter(unassigned_issues);
-
-            userStoriesTesting = userStoriesTesting.OrderByDescending(x => x.milestone_start).ToList();
-            issuesTesting = issuesTesting.OrderByDescending(x => x.finished_date).ToList();
-
-
-
             //*** CSV Writing ***//
             CSVReportWriter.OutputIssues(path, issues, "issues");
-            CSVReportWriter.OutputIssues(path, unassigned_issues, "unassigned_issues");
-            CSVReportWriter.OutputIssues(path, issuesTesting, "issues_completed");
             CSVReportWriter.OutputUserStories(path, userStories, "user_stories");
-            CSVReportWriter.OutputUserStories(path, userStoriesTesting, "user_stories_completed_");
-            CSVReportWriter.OutputByUser(path+"/ByUser", uniqueUsers, userStories, issues);
+            Reports.ByUser(path+"/ByUser", uniqueUsers, userStories, issues);
+            Reports.ByMilestone(path + "/ByMilestone", uniqueUsers, userStories);
             Console.WriteLine("End");
         }
 
