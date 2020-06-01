@@ -71,8 +71,9 @@ namespace TaigaPlanningPokerListMaker
                             {
                                k += _points.Where(x => x.id.ToString().Equals(pt.Value.ToString())).FirstOrDefault().value;
                             }
-                            u.total_us_points = k;
+                            
                         }
+                        u.total_us_points = k;
                     }
 
                     //update project name
