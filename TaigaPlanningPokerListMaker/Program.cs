@@ -61,9 +61,12 @@ namespace TaigaPlanningPokerListMaker
                             u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
                         if (u.milestone != null && _milestones.Any(x => x.project == p.id))
                             u.milestone_str = _milestones.FirstOrDefault(x => x.id == u.milestone).name;
-                        foreach(var pt in u.points)
+                        
+                        
+                        int? k = 0;
+                        foreach (var pt in u.points)
                         {
-                            int? k = 0;
+
                             if (_points.Any(x => x.id.ToString().Equals(pt.Value.ToString())))
                             {
                                k += _points.Where(x => x.id.ToString().Equals(pt.Value.ToString())).FirstOrDefault().value;
