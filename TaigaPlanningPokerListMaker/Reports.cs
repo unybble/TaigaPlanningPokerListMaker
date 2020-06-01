@@ -16,9 +16,12 @@ namespace TaigaPlanningPokerListMaker
             Directory.CreateDirectory(path);
 
             var milestones = userStories.Where(x => x.milestone!=null).Distinct();
+            Console.WriteLine("-- Milestones --");
 
-            foreach(var m in milestones)
+            foreach (var m in milestones)
             {
+                Console.WriteLine(m.milestone_str);
+
                 List<UserStory> _us = new List<UserStory>();
                 foreach (var name in users)
                 {
@@ -44,7 +47,7 @@ namespace TaigaPlanningPokerListMaker
 
         public static void ByUser(string path, List<string> users, List<UserStory> userStories, List<Issue> issues)
         {
-
+            Console.WriteLine("-- By User --");
             Directory.CreateDirectory(path);
 
             foreach (var name in users)
