@@ -64,8 +64,9 @@ namespace TaigaPlanningPokerListMaker
                     }
 
                     //update project name
-                    p.userStories.ForEach(x => x.project_str = p.name);
-                    userStories.AddRange(p.userStories);
+                    var j = p.userStories.Where(x => !x.status_str.ToLower().Equals("archived"));
+                    j.ForEach(x => x.project_str = p.name);
+                    userStories.AddRange(j);
                     //create user specific list
 
 
