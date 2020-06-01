@@ -63,7 +63,6 @@ namespace TaigaPlanningPokerListMaker
                             u.milestone_str = _milestones.FirstOrDefault(x => x.id == u.milestone).name;
                         foreach(var pt in u.points)
                         {
-                            Console.WriteLine(pt.Value + " " + _points.FirstOrDefault().value);
                             int? k = 0;
                             if (_points.Any(x => x.id.ToString().Equals(pt.Value.ToString())))
                             {
