@@ -67,11 +67,8 @@ namespace TaigaPlanningPokerListMaker
                         foreach (var pt in u.points)
                         {
 
-                            if (_points.Any(x => x.id.ToString().Equals(pt.Value.ToString())))
-                            {
+                            if (_points.Any(x => x.id.ToString().Equals(pt.Value.ToString())) && _points.Where(x => x.id.ToString().Equals(pt.Value.ToString())).FirstOrDefault().value!=null)
                                k += _points.Where(x => x.id.ToString().Equals(pt.Value.ToString())).FirstOrDefault().value;
-                            }
-                            
                         }
                         u.total_us_points = k;
                     }
