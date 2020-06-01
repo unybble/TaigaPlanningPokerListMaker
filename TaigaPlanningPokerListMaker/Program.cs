@@ -40,7 +40,8 @@ namespace TaigaPlanningPokerListMaker
                 {
                     //get milestones
                     var _milestones = await Milestone.GetAll(p.id, client);
-
+                    //get points
+                    var _points = await Point.GetAll(p.id, client);
                     Console.WriteLine(p.name);
                     //list of users for open issues
                     List<User> _users = await User.GetAll(p.id, client);
@@ -53,14 +54,23 @@ namespace TaigaPlanningPokerListMaker
                     //add username to the userlist
                     foreach (var u in p.userStories)
                     {
-                        Console.Write(".");
+                       
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
                         if (u.owner != null && _users.Any(x => x.id == u.owner))
                             u.owner_name = _users.FirstOrDefault(x => x.id == u.owner).full_name;
                         if (u.milestone != null && _milestones.Any(x => x.project == p.id))
                             u.milestone_str = _milestones.FirstOrDefault(x => x.id == u.milestone).name;
-
+                        foreach(var pt in u.points)
+                        {
+                            Console.WriteLine(pt.Value + " " + _points.FirstOrDefault().value);
+                            int? k = 0;
+                            if (_points.Any(x => x.id.ToString().Equals(pt.Value.ToString())))
+                            {
+                               k += _points.Where(x => x.id.ToString().Equals(pt.Value.ToString())).FirstOrDefault().value;
+                            }
+                            u.total_us_points = k;
+                        }
                     }
 
                     //update project name
@@ -76,7 +86,7 @@ namespace TaigaPlanningPokerListMaker
 
                     foreach (var u in p.issues)
                     {
-                        Console.Write("+");
+                        
                         if (u.assigned_to != null && _users.Any(x => x.id == u.assigned_to))
                             u.assigned_to_name = _users.FirstOrDefault(x => x.id == u.assigned_to).full_name;
                         if(u.owner !=null && _users.Any(x => x.id == u.owner))
@@ -104,7 +114,6 @@ namespace TaigaPlanningPokerListMaker
             CSVReportWriter.OutputIssues(path, issues, "issues");
             CSVReportWriter.OutputUserStories(path, userStories, "user_stories");
             Reports.ByUser(path+"/ByUser", uniqueUsers, userStories, issues);
-            Reports.ByMilestone(path + "/ByMilestone", uniqueUsers, userStories);
             Console.WriteLine("End");
         }
 

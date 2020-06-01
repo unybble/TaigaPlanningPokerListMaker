@@ -27,6 +27,7 @@ namespace TaigaPlanningPokerListMaker
             Map(m => m.tags).Ignore();
             Map(m => m.tag_list).Ignore();
             Map(m => m.id).Ignore();
+            Map(m => m.points).Ignore();
         }
     }
 
@@ -92,6 +93,10 @@ namespace TaigaPlanningPokerListMaker
                 return list;
             }
         }
+        [Name("Points")]
+        public int? total_us_points { get; set; }
+        
+        public JObject points { get; set; }
         public JArray tags { get; set; }
         [Name("Status")]
         public string status_str { get; set; }
